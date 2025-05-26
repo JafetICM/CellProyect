@@ -1,3 +1,4 @@
+//lib/screens/registro_visitante.dart
 import 'package:flutter/material.dart';
 
 class RegistroVisitanteScreen extends StatefulWidget {
