@@ -169,13 +169,13 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
                             ),
                           )
                         : const Text('Registrar'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+                  ),// ElevatedButton
+                ),// ElevatedButton
+              ],// Column
+            ), // SingleChildScrollView
+          ),// Form
+        ),// Padding
+      ),// Scaffold
+    );// Scaffold
   }
 }
