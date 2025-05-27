@@ -5,17 +5,6 @@ import 'dart:convert';
 class ApiService {
   static const String baseUrl = 'https://api-stand.onrender.com/api';
 
-  static Future<bool> existeVisitante(String correo) async {
-    final url = Uri.parse('$baseUrl/visitantes?correo=$correo');
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data.isNotEmpty;
-    }
-    return false;
-  }
-
   static Future<bool> registrarVisitante(Map<String, dynamic> visitante) async {
     final url = Uri.parse('$baseUrl/visitantes');
 
