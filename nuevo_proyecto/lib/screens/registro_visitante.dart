@@ -20,12 +20,31 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
   final cargoController = TextEditingController();
   final notasController = TextEditingController();
 
-  List<String> productos = ['Producto A', 'Producto B', 'Producto C'];
+  List<String> productos = [];
   List<String> seleccionados = [];
 
   bool _isLoading = false;
   bool _registrado = false;
+  bool _cargandoProductos = true;  // Nuevo estado para carga de productos
   late Visitante _visitanteRegistrado;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarProductos();
+  }
+
+  Future<void> _cargarProductos() async {
+    final productosApi = await ApiService.obtenerProductos();
+    if (productosApi.isNotEmpty) {
+      setState(() {
+        productos = productosApi;
+      });
+    }
+    setState(() {
+      _cargandoProductos = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -84,6 +103,13 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
             size: 250,
           ),
         ),
+      );
+    }
+
+    if (_cargandoProductos) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Registro de Visitante')),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -169,13 +195,15 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
                             ),
                           )
                         : const Text('Registrar'),
-                  ),// ElevatedButton
-                ),// ElevatedButton
-              ],// Column
-            ), // SingleChildScrollView
-          ),// Form
-        ),// Padding
-      ),// Scaffold
-    );// Scaffold
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
+// This code defines a screen for registering a visitor, allowing them to enter their details,
+// select products of interest, and generate a QR code upon successful registration.
