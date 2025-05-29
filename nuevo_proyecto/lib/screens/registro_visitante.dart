@@ -1,8 +1,10 @@
-//lib/screens/registro_visitante.dart
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter/services.dart';
 import '../models/visitante.dart';
 import '../services/api_service.dart';
+
+enum CanalNotificacion { correo, telefono }
 
 class RegistroVisitanteScreen extends StatefulWidget {
   const RegistroVisitanteScreen({Key? key}) : super(key: key);
@@ -23,6 +25,8 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
 
   List<String> productos = [];
   List<String> seleccionados = [];
+
+  CanalNotificacion? _canalSeleccionado;
 
   bool _isLoading = false;
   bool _registrado = false;
@@ -58,8 +62,22 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
     super.dispose();
   }
 
+  String? validarCorreo(String? value) {
+    if (value == null || value.isEmpty) return 'Campo requerido';
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(value)) return 'Correo no válido';
+    return null;
+  }
+
   Future<void> _registrar() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_canalSeleccionado == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona un canal de notificación')),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -73,7 +91,11 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
       notas: notasController.text.isEmpty ? null : notasController.text,
     );
 
-    bool exito = await ApiService.registrarVisitante(visitante.toJson());
+    // Aquí podrías añadir el canal de notificación si tu backend lo soporta
+    Map<String, dynamic> jsonVisitante = visitante.toJson();
+    jsonVisitante['canal_notificacion'] = _canalSeleccionado == CanalNotificacion.correo ? 'correo' : 'telefono';
+
+    bool exito = await ApiService.registrarVisitante(jsonVisitante);
 
     setState(() => _isLoading = false);
 
@@ -159,17 +181,20 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
               TextFormField(
                 controller: correoController,
                 decoration: _inputDecoration('Correo electrónico'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Campo requerido' : null,
+                validator: validarCorreo,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: telefonoController,
                 decoration: _inputDecoration('Teléfono'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Campo requerido' : null,
                 keyboardType: TextInputType.phone,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Campo requerido';
+                  if (value.length != 10) return 'El teléfono debe tener 10 dígitos';
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -221,6 +246,39 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
                 maxLines: 3,
               ),
               const SizedBox(height: 32),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '¿Por dónde quieres recibir notificaciones?',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  RadioListTile<CanalNotificacion>(
+                    title: const Text('Correo electrónico'),
+                    value: CanalNotificacion.correo,
+                    groupValue: _canalSeleccionado,
+                    onChanged: (CanalNotificacion? value) {
+                      setState(() {
+                        _canalSeleccionado = value;
+                      });
+                    },
+                  ),
+                  RadioListTile<CanalNotificacion>(
+                    title: const Text('Teléfono'),
+                    value: CanalNotificacion.telefono,
+                    groupValue: _canalSeleccionado,
+                    onChanged: (CanalNotificacion? value) {
+                      setState(() {
+                        _canalSeleccionado = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -260,3 +318,7 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
     );
   }
 }
+// El código anterior define una pantalla de registro de visitantes en Flutter. Permite ingresar datos personales, seleccionar productos de interés y elegir un canal de notificación. Al enviar el formulario, se valida la información y se registra al visitante, mostrando un código QR con los datos registrados. La interfaz es responsiva y utiliza un diseño limpio y moderno. Además, incluye validaciones para campos obligatorios y formatos específicos como el correo electrónico y el número de teléfono.
+// También maneja el estado de carga y muestra mensajes de éxito o error según el resultado del registro. La lista de productos se carga desde un servicio API, y se utiliza un formulario para capturar la información del visitante. La pantalla es fácil de navegar y está diseñada para ser intuitiva para el usuario final.
+// El código utiliza widgets de Flutter como `TextFormField`, `CheckboxListTile`, y `RadioListTile` para crear una experiencia de usuario interactiva. Además, emplea `QrImageView` para generar un código QR con los datos del visitante registrado, lo que facilita el acceso a la información de manera rápida y eficiente.
+// Este código es un ejemplo completo de cómo implementar un registro de visitantes en una aplicación Flutter, integrando validaciones, selección de productos y generación de códigos QR.
