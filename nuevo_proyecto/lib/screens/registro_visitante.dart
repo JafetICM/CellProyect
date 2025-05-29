@@ -1,3 +1,4 @@
+//lib/screens/registro_visitante.dart
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/visitante.dart';
@@ -25,7 +26,7 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
 
   bool _isLoading = false;
   bool _registrado = false;
-  bool _cargandoProductos = true;  // Nuevo estado para carga de productos
+  bool _cargandoProductos = true;
   late Visitante _visitanteRegistrado;
 
   @override
@@ -92,6 +93,30 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
     }
   }
 
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Color(0xFF4CAF50)),
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFF4CAF50)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFF0080FF), width: 2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.redAccent),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_registrado) {
@@ -100,7 +125,7 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
         body: Center(
           child: QrImageView(
             data: _visitanteRegistrado.toJson().toString(),
-            size: 250,
+            size: 280,
           ),
         ),
       );
@@ -114,96 +139,124 @@ class _RegistroVisitanteScreenState extends State<RegistroVisitanteScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Registro de Visitante')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      appBar: AppBar(
+        title: const Text('Registro de Visitante'),
+        backgroundColor: const Color(0xFF4CAF50),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Form(
           key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: nombreController,
-                  decoration: const InputDecoration(labelText: 'Nombre completo'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo requerido' : null,
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: correoController,
-                  decoration: const InputDecoration(labelText: 'Correo electrónico'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo requerido' : null,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: telefonoController,
-                  decoration: const InputDecoration(labelText: 'Teléfono'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Campo requerido' : null,
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: empresaController,
-                  decoration: const InputDecoration(labelText: 'Empresa (opcional)'),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: cargoController,
-                  decoration: const InputDecoration(labelText: 'Cargo (opcional)'),
-                ),
-                const SizedBox(height: 16),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Productos de interés:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+          child: Column(
+            children: [
+              TextFormField(
+                controller: nombreController,
+                decoration: _inputDecoration('Nombre completo'),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Campo requerido' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: correoController,
+                decoration: _inputDecoration('Correo electrónico'),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Campo requerido' : null,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: telefonoController,
+                decoration: _inputDecoration('Teléfono'),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Campo requerido' : null,
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: empresaController,
+                decoration: _inputDecoration('Empresa (opcional)'),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: cargoController,
+                decoration: _inputDecoration('Cargo (opcional)'),
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Productos de interés:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.grey.shade800,
                   ),
                 ),
-                ...productos.map((producto) => CheckboxListTile(
-                      title: Text(producto),
-                      value: seleccionados.contains(producto),
-                      onChanged: (bool? value) {
-                        setState(() {
-                          if (value == true) {
-                            seleccionados.add(producto);
-                          } else {
-                            seleccionados.remove(producto);
-                          }
-                        });
-                      },
-                    )),
-                TextFormField(
-                  controller: notasController,
-                  decoration: const InputDecoration(labelText: 'Notas adicionales'),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _registrar,
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text('Registrar'),
+              ),
+              const SizedBox(height: 10),
+              ...productos.map((producto) => CheckboxListTile(
+                    title: Text(
+                      producto,
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    activeColor: const Color(0xFF4CAF50),
+                    value: seleccionados.contains(producto),
+                    onChanged: (bool? value) {
+                      setState(() {
+                        if (value == true) {
+                          seleccionados.add(producto);
+                        } else {
+                          seleccionados.remove(producto);
+                        }
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  )),
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: notasController,
+                decoration: _inputDecoration('Notas adicionales'),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _registrar,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4CAF50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 5,
+                    shadowColor: Colors.green.shade700,
                   ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                          ),
+                        )
+                      : const Text(
+                          'Registrar',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-// This code defines a screen for registering a visitor, allowing them to enter their details,
-// select products of interest, and generate a QR code upon successful registration.
