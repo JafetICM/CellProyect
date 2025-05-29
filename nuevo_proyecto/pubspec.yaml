@@ -1,5 +1,5 @@
 name: nuevo_proyecto
-description: "A new Flutter project."
+description: "Un proyecto de telecomunicaciones para la empresa Ahro Telecom, que incluye funcionalidades como escaneo de códigos QR, verificación de conectividad y más (Para clientes)."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -32,7 +32,7 @@ dependencies:
     sdk: flutter
   http: ^0.13.5
   qr_flutter: ^4.0.0
-
+  connectivity_plus: ^4.0.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -59,6 +59,8 @@ flutter_icons:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/Ahro_logo.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

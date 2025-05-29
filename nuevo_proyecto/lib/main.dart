@@ -1,6 +1,5 @@
-//lib/main.dart
 import 'package:flutter/material.dart';
-import 'screens/registro_visitante.dart';
+import 'screens/home_screen.dart';  // Asegúrate que la ruta es correcta
 
 void main() {
   runApp(const MyApp());
@@ -12,10 +11,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Desactiva el banner de depuración
+      debugShowCheckedModeBanner: false,
       title: 'App Stand',
       theme: ThemeData(
-        primaryColor: const Color(0xFF4CAF50), // Verde
+        primaryColor: const Color(0xFF4CAF50),
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: const Color(0xFF4CAF50),
@@ -35,7 +34,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const RegistroVisitanteScreen(),
+      home: const HomeScreen(),  // Aquí la pantalla que usa connectivity_plus
     );
   }
 }
